@@ -63,8 +63,18 @@ Many other applications at Voodoo will use consume this API.
 We are planning to put this project in production. According to you, what are the missing pieces to make this project production ready? 
 Please elaborate an action plan.
 
+What misses in my opinion are:
+- the whole environement variables configuration
+- the docker image file to properly package everything 
+- more tests and the CI CD
+- a real database connection with migrations files handler 
+- we also need a domain name and everything needed to deploy.
+- some prettier / linter rules would be nice to have.
+
 #### Question 2:
 Let's pretend our data team is now delivering new files every day into the S3 bucket, and our service needs to ingest those files
 every day through the populate API. Could you describe a suitable solution to automate this? Feel free to propose architectural changes.
 
-
+If we need to ingest new files regurarly, I would certainly ust start with a small node cron to pull new files every nights if not needed to do it quicker.
+I would also keep track of which files have already been imported by either saving this record in a db and use a unique folder in S3. Or I would just move the file to another directory once properly handled.
+Database transactions handling and dupliquates handling are really important in this case. 
