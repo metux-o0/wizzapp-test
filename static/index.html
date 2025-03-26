@@ -22,6 +22,11 @@
 <div id="app" class="container">
   <section class="section section-container" style="padding-bottom: 10px;">
     <div class="box">
+      <populate title="Populate Apps from GooglePlayStore and AppStore" @populate="populate" />
+    </div>
+  </section>
+  <section class="section section-container" style="padding-bottom: 10px;">
+    <div class="box">
       <search-games title="Search Games" @search-games-db="searchGames" :search="search" />
     </div>
   </section>
@@ -167,6 +172,27 @@
     `
   }
 
+  const Populate = {
+  data:{
+     apiURL: 'http://localhost:3000/api/games'
+  },
+  methods: {
+  populate() {
+    console.log("📢 Populate button clicked! Emitting event..."); 
+    this.$emit("populate");
+  }
+},
+    template: `
+       <form class="form" @submit.prevent="populate">
+         <h2 class="title">Populate top hundred apps</h2>
+        <div class="field">
+          <div class="control">
+            <button class="button is-success">Populate</button>
+          </div>
+        </div>
+      </form>
+    `
+  }
   const Search = {
     data () {
       return {
@@ -209,7 +235,7 @@
 
   new Vue({
     el: '#app',
-    components: { game: Game, 'add-update-game': AddUpdateGame, 'search-games': Search },
+    components: { game: Game, 'add-update-game': AddUpdateGame, 'search-games': Search, 'populate': Populate  },
     data: {
       games: [],
       search: [],
@@ -255,6 +281,14 @@
           .then((response) => {
             this.games = response.data
           })
+      },
+      populate() {
+        console.log("📢 Populate method triggered!");
+        return axios.get(`${this.apiURL}/populate`)
+          .then((response) => {
+           this.games = [...this.games, ...response.data];
+        })
+      .catch(error => console.error("Error populating apps:", error));
       }
     },
     beforeMount () {
