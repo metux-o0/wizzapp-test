@@ -7,6 +7,8 @@ const app = express();
 app.use(bodyParser.json());
 app.use(express.static(`${__dirname}/static`));
 
+app.use(require('./src/search/search.controller'));
+
 app.get('/api/games', (req, res) => db.Game.findAll()
   .then((games) => res.send(games))
   .catch((err) => {

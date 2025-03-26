@@ -2,19 +2,20 @@ const request = require('supertest');
 const assert = require('assert');
 const app = require('../index');
 
+const data = {
+  publisherId: '1234567890',
+  name: 'Test App',
+  platform: 'ios',
+  storeId: '1234',
+  bundleId: 'test.bundle.id',
+  appVersion: '1.0.0',
+  isPublished: true,
+};
+
 /**
  * Testing create game endpoint
  */
 describe('POST /api/games', () => {
-  const data = {
-    publisherId: '1234567890',
-    name: 'Test App',
-    platform: 'ios',
-    storeId: '1234',
-    bundleId: 'test.bundle.id',
-    appVersion: '1.0.0',
-    isPublished: true,
-  };
   it('respond with 200 and an object that matches what we created', (done) => {
     request(app)
       .post('/api/games')
@@ -64,7 +65,7 @@ describe('GET /api/games', () => {
  * Testing update game endpoint
  */
 describe('PUT /api/games/1', () => {
-  const data = {
+  const updateData = {
     id: 1,
     publisherId: '999000999',
     name: 'Test App Updated',
@@ -77,19 +78,19 @@ describe('PUT /api/games/1', () => {
   it('respond with 200 and an updated object', (done) => {
     request(app)
       .put('/api/games/1')
-      .send(data)
+      .send(updateData)
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(200)
       .end((err, result) => {
         if (err) return done(err);
-        assert.strictEqual(result.body.publisherId, '999000999');
-        assert.strictEqual(result.body.name, 'Test App Updated');
-        assert.strictEqual(result.body.platform, 'android');
-        assert.strictEqual(result.body.storeId, '5678');
-        assert.strictEqual(result.body.bundleId, 'test.newBundle.id');
-        assert.strictEqual(result.body.appVersion, '1.0.1');
-        assert.strictEqual(result.body.isPublished, false);
+        assert.strictEqual(result.body.publisherId, updateData.publisherId);
+        assert.strictEqual(result.body.name, updateData.name);
+        assert.strictEqual(result.body.platform, updateData.platform);
+        assert.strictEqual(result.body.storeId, updateData.storeId);
+        assert.strictEqual(result.body.bundleId, updateData.bundleId);
+        assert.strictEqual(result.body.appVersion, updateData.appVersion);
+        assert.strictEqual(result.body.isPublished, updateData.isPublished);
         done();
       });
   });
@@ -125,6 +126,25 @@ describe('GET /api/games', () => {
       .end((err, result) => {
         if (err) return done(err);
         assert.strictEqual(result.body.length, 0);
+        done();
+      });
+  });
+});
+
+/**
+ * Testing search endpoint
+ */
+describe('POST /api/games/search', () => {
+  it('respond with 200 and an object that matches what we searched', (done) => {
+    request(app)
+      .post('/api/games/search')
+      .send({ name: data.name, platform: data.platform })
+      .set('Accept', 'application/json')
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .end((err, result) => {
+        if (err) return done(err);
+        assert.strictEqual(result.body[0].name, data.name);
         done();
       });
   });
